@@ -54,3 +54,7 @@ JSONValue::~JSONValue() {
                   delete (*bool) data; break;
     }
 }
+
+void JSONValue::printData(FILE* out = stdout) {
+    out << "\"" << *data << "\"";
+}
