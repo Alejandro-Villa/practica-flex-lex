@@ -6,14 +6,14 @@ JSONValue::JSONValue(value_t jsonType, size_t dataSize, void* jsonData) {
     type = jsonType;
     switch (type) {
         case str:
-            data = new string[jsonData->size()];
-            if(copy(data, jsonData->size()) != jsonData->size())
+            size = dataSize;
+            data = new string[size];
+            if(static_cast<string*>(jsonData)->copy((char*)data, size, 0) != size)
                cerr << "ERR:JSONValue(): No se han copiado todos los caracteres" << endl;
-            size = data.size();
             break;
         case num:
             data = new long double;
-            *data = *jsonData;
+            *(long double*)data = *(long double*)jsonData;
             break;
         case obj:
             /* TODO */
@@ -23,16 +23,16 @@ JSONValue::JSONValue(value_t jsonType, size_t dataSize, void* jsonData) {
             break;
         case tru:
             data = new bool;
-            *data = true;
+            *(bool*)data = true;
             break;
         case fal:
             data = new bool;
-            *data = false;
+            *(bool*)data = false;
             break;
         case nil:
             data = NULL;
             break;
-        case default:
+        default:
             cerr << "ERR:JSONValue(): Tipo de Valor no reconocido" << endl;
             exit(1);
     }
@@ -40,8 +40,8 @@ JSONValue::JSONValue(value_t jsonType, size_t dataSize, void* jsonData) {
 
 JSONValue::~JSONValue() {
     switch (type) {
-        case str: delete[] (*string) data; break;
-        case num: delete (*long double) data; break;
+        case str: delete[] (string*) data; break;
+        case num: delete (long double*) data; break;
         case obj:
             /* TODO */
             break;
@@ -51,10 +51,27 @@ JSONValue::~JSONValue() {
         case tru:
         case fal:
         case nil:
-                  delete (*bool) data; break;
+                  delete (bool*)data; break;
     }
 }
 
-void JSONValue::printData(FILE* out = stdout) {
-    out << "\"" << *data << "\"";
+void JSONValue::printData(FILE* out) {
+    switch (type) {
+        case str: 
+            fprintf(out, "\"%s\"", (string*)data); break;
+        case num:
+            fprintf(out, "\"%g\"", (long double*)data); break;
+        case obj:
+            /* TODO */
+            break;
+        case arr:
+            /* TODO */
+            break;
+        case tru:
+            fprintf(out, "\"true\""); break;
+        case fal:
+            fprintf(out, "\"false\""); break;
+        case nil:
+            fprintf(out, "\"nil\""); break;
+    }
 }

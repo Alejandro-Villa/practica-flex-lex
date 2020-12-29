@@ -22,7 +22,7 @@ typedef value_json value_t;
 /* Clases para ayudar en el manejo de información estilo JSON */
 class JSONValue {
     private:
-       const value_t type;
+       value_t type;
        size_t size;
        void* data;
     public:
