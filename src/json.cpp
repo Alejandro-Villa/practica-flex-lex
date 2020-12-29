@@ -58,9 +58,9 @@ JSONValue::~JSONValue() {
 void JSONValue::printData(FILE* out) {
     switch (type) {
         case str: 
-            fprintf(out, "\"%s\"", (string*)data); break;
+            fprintf(out, "\"%s\"", static_cast<string*>(data)->c_str()); break;
         case num:
-            fprintf(out, "\"%g\"", (long double*)data); break;
+            fprintf(out, "\"%Lg\"", *(long double*)data); break;
         case obj:
             /* TODO */
             break;
