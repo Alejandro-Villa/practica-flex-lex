@@ -3,7 +3,8 @@
 
 # tool macros
 CC := g++ # FILL: the compiler
-CCFLAGS := -Wall -Wextra -Wpedantic --std=c++11 # FILL: compile flags
+INC_PATH := inc
+CCFLAGS := -Wall -Wextra -Wpedantic --std=c++11 -I$(INC_PATH) # FILL: compile flags
 DBGFLAGS := -g
 CCOBJFLAGS := $(CCFLAGS) -c
 
@@ -13,7 +14,6 @@ FLEXFLAGS := # FILL: flex++ flags
 # path macros
 BIN_PATH := bin
 OBJ_PATH := obj
-INC_PATH := inc
 SRC_PATH := src
 LEX_PATH := src/lex
 DBG_PATH := debug
@@ -29,7 +29,8 @@ TARGET_DEBUG := $(DBG_PATH)/$(TARGET_NAME)
 
 # src files & obj files
 LEX := $(foreach x, $(LEX_PATH), $(wildcard $(addprefix $(x)/*,.l)))
-SRC := $(addprefix $(SRC_PATH)/, $(addsuffix .cpp, $(notdir $(basename $(LEX))))) 
+INC := $(foreach x, $(INC_PATH), $(wildcard $(addprefix $(x)/*,.h)))
+SRC := $(addprefix $(SRC_PATH)/, $(addsuffix .cpp, $(notdir $(basename $(LEX)))))
 SRC += $(foreach x, $(SRC_PATH), $(wildcard $(addprefix $(x)/*,.cpp)))
 OBJ := $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 OBJ_DEBUG := $(addprefix $(DBG_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
@@ -45,11 +46,11 @@ CLEAN_LIST := $(TARGET) \
 default: makedir all
 
 # non-phony targets
-$(TARGET): $(OBJ)
+$(TARGET): $(OBJ) $(INC)
 	$(CC) $(CCFLAGS) -o $@ $(OBJ)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp
-	$(CC) $(CCOBJFLAGS) -I$(INC_PATH) -o $@ $<
+	$(CC) $(CCOBJFLAGS) -o $@ $<
 
 $(SRC_PATH)/%.cpp: $(LEX_PATH)/%.l
 	$(FLEX) $(FLEXFLAGS) -o $@ $<
