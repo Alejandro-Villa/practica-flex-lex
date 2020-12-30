@@ -1,18 +1,17 @@
 #include "json.h"
+#include <cstring>
 
 using namespace std;
 
-JSONValue::JSONValue(value_t jsonType, size_t dataSize, void* jsonData) {
-    type = jsonType;
-    switch (type) {
+void* assingData(value_t jsonType, size_t dataSize, void* jsonData) {
+    void* data = NULL;
+    switch (jsonType) {
         case str:
-            size = dataSize;
-            data = new string[size];
-            if(static_cast<string*>(jsonData)->copy((char*)data, size, 0) != size)
-               cerr << "ERR:JSONValue(): No se han copiado todos los caracteres" << endl;
+            data = calloc(dataSize, sizeof(char));  //new char[size];
+            strcpy((char*)data, (char*)jsonData);
             break;
         case num:
-            data = new long double;
+            data = malloc(sizeof(long double)); //new long double;
             *(long double*)data = *(long double*)jsonData;
             break;
         case obj:
@@ -22,11 +21,11 @@ JSONValue::JSONValue(value_t jsonType, size_t dataSize, void* jsonData) {
             /* TODO */
             break;
         case tru:
-            data = new bool;
+            data = malloc(sizeof(bool)); //new bool;
             *(bool*)data = true;
             break;
         case fal:
-            data = new bool;
+            data = malloc(sizeof(bool)); //new bool;
             *(bool*)data = false;
             break;
         case nil:
@@ -36,23 +35,38 @@ JSONValue::JSONValue(value_t jsonType, size_t dataSize, void* jsonData) {
             cerr << "ERR:JSONValue(): Tipo de Valor no reconocido" << endl;
             exit(1);
     }
+    return data;
+}
+
+JSONValue::JSONValue(value_t jsonType, size_t dataSize, void* jsonData) {
+    type = jsonType;
+    size = dataSize;
+    data = assingData(type, size, jsonData);
+}
+
+JSONValue::JSONValue(const JSONValue& orig) {
+    type = orig.type;
+    size = orig.size;
+    data = assingData(type, size, orig.data);
 }
 
 JSONValue::~JSONValue() {
+    if(data != NULL) free(data);
+    data = NULL;
+    /*
     switch (type) {
-        case str: delete[] (string*) data; break;
-        case num: delete (long double*) data; break;
+        case str: break;
+        case num: break;
         case obj:
-            /* TODO */
             break;
         case arr:
-            /* TODO */
             break;
         case tru:
         case fal:
         case nil:
                   delete (bool*)data; break;
     }
+    */
 }
 
 void JSONValue::printData(FILE* out) {
@@ -74,4 +88,8 @@ void JSONValue::printData(FILE* out) {
         case nil:
             fprintf(out, "\"nil\""); break;
     }
+}
+
+void JSONObject::add_pair(const std::pair<std::string, JSONValue>& data) {
+    contents.push_back(data);
 }
