@@ -33,3 +33,12 @@ class Array {
 ```
 
 Para la clase Array simplemente guardamos un vector de valores. La STL debería ayudarnos aquí y deberíamos tener memoria dinámica.
+
+- **Problema** Demasiada complejidad/recursión en las reglas que tengo ahora mismo, creo que el problema está en:
+```
+OBJECT          \{({WHITESPACE}*|{PAIR}(,{PAIR})*)\}
+PAIR            {WHITESPACE}?{STRING}:{VALUE}
+VALUE           {WHITESPACE}?({STRING}|{OBJECT}|{ARRAY}|{NUMBER}|true|false|null){WHITESPACE}?
+ARRAY           \[({WHITESPACE}*|{VALUE}(,{VALUE})*)\]
+```
+Una posible solución es crear una condición de arrranque para objeto, que vaya construyendo en memoria la clase JSONObject a la vez que parsea, y así lo mismo me puedo librar de que flex haga la recursión por sí mismo (y lo interprete como algo infinito). Pasa igual con Array, así que debería crear un entorno para Array tmb.
