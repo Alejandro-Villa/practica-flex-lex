@@ -4,12 +4,12 @@
 # tool macros
 CC := g++ # FILL: the compiler
 INC_PATH := inc
-CCFLAGS := -Wall -Wextra -Wpedantic --std=c++11 -I$(INC_PATH) # FILL: compile flags
+CCFLAGS := -Wall -Wextra -Wpedantic --std=c++11 -g -I$(INC_PATH) # FILL: compile flags
 DBGFLAGS := -g
 CCOBJFLAGS := $(CCFLAGS) -c
 
-FLEX := flex++
-FLEXFLAGS := # FILL: flex++ flags
+FLEX := flex
+FLEXFLAGS := #-d # FILL: flex++ flags
 
 # path macros
 BIN_PATH := bin
@@ -18,6 +18,7 @@ SRC_PATH := src
 LEX_PATH := src/lex
 DBG_PATH := debug
 DOC_PATH := doc
+TEST_PATH := test
 
 # compile macros
 TARGET_NAME := jy-parser # FILL: target name
@@ -34,6 +35,7 @@ SRC := $(addprefix $(SRC_PATH)/, $(addsuffix .cpp, $(notdir $(basename $(LEX))))
 SRC += $(foreach x, $(SRC_PATH), $(wildcard $(addprefix $(x)/*,.cpp)))
 OBJ := $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 OBJ_DEBUG := $(addprefix $(DBG_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
+TEST := $(foreach x, $(TEST_PATH), $(wildcard $(addprefix $(x)/*,.json)))
 
 # clean files list
 DISTCLEAN_LIST := $(OBJ) \
@@ -64,7 +66,7 @@ $(TARGET_DEBUG): $(OBJ_DEBUG)
 # phony rules
 .PHONY: makedir
 makedir:
-	@mkdir -p $(BIN_PATH) $(OBJ_PATH) $(DBG_PATH) $(DOC_PATH)
+	@mkdir -p $(BIN_PATH) $(OBJ_PATH) $(DBG_PATH) $(DOC_PATH) $(TEST_PATH)
 
 .PHONY: all
 all: $(TARGET)
@@ -81,3 +83,8 @@ clean:
 distclean:
 	@echo CLEAN $(DISTCLEAN_LIST)
 	@rm -f $(DISTCLEAN_LIST)
+
+.PHONY: test
+test: clean all $(TEST)
+	@echo "COMENZANDO TESTS"
+	-@$(foreach testcase, $(TEST), $(TARGET) $(testcase);)
