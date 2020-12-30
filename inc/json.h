@@ -27,11 +27,12 @@ class JSONValue {
        void* data;
     public:
        JSONValue(value_t jsonType, size_t dataSize, void* jsonData);
+       JSONValue(const JSONValue& orig);
        ~JSONValue(); 
        inline value_t getType() {return type;}
        void printData(FILE* out = stdout);
        friend std::ostream &operator<<(std::ostream &out, const JSONValue& value);
-       friend std::istream &operator<<(std::istream &in, JSONValue& value);
+       friend std::istream &operator>>(std::istream &in, JSONValue& value);
 };
 
 class JSONArray {
@@ -42,6 +43,10 @@ class JSONArray {
 class JSONObject {
     private:
         std::vector<std::pair<std::string, JSONValue>> contents;
+    public:
+        void add_pair(const std::pair<std::string, JSONValue>& data);
+        void printData(FILE* out = stdout);
+        friend std::ostream &operator<<(std::ostream &out, const JSONObject& obj);
 };
 
 #endif
