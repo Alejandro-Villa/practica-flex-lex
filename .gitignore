@@ -2,4 +2,5 @@ obj
 obj/*
 bin
 bin/*
+doc/*.pdf
 *.pdf
